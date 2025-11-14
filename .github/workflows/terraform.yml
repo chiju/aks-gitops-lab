@@ -15,8 +15,6 @@ permissions:
   id-token: write
   contents: read
   pull-requests: write
-  security-events: write
-  actions: read
 
 env:
   TF_VERSION: '1.13.5'
@@ -36,14 +34,7 @@ jobs:
       with:
         scan-type: 'config'
         scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-
-    - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v4
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
+        format: 'table'
 
   terraform:
     name: 'Terraform'
