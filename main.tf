@@ -31,4 +31,4 @@ module "argocd" {
   chart_version = "9.1.3"
 
   depends_on = [module.aks]
-}
+}# Updated Fri Nov 14 22:18:12 CET 2025
