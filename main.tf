@@ -32,3 +32,4 @@ module "argocd" {
 
   depends_on = [module.aks]
 }# Updated Fri Nov 14 22:18:12 CET 2025
+# Trigger workflow Fri Nov 14 22:35:21 CET 2025
