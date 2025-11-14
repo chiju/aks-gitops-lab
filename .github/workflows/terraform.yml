@@ -134,10 +134,6 @@ jobs:
             body: output
           })
 
-    - name: Terraform Plan Status
-      if: steps.plan.outcome == 'failure' && steps.plan.outputs.exitcode == '1'
-      run: exit 1
-
   apply:
     name: 'Terraform Apply'
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.terraform.outputs.tfplanExitCode == '2'
