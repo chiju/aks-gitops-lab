@@ -23,3 +23,12 @@ module "aks" {
   subnet_id           = module.vnet.aks_subnet_id
   kubernetes_version  = var.kubernetes_version
 }
+
+module "argocd" {
+  source = "./modules/argocd"
+
+  namespace     = "argocd"
+  chart_version = "9.1.3"
+
+  depends_on = [module.aks]
+}

@@ -32,3 +32,18 @@ output "aks_cluster_fqdn" {
   description = "FQDN of the AKS cluster"
   value       = module.aks.cluster_fqdn
 }
+
+output "argocd_namespace" {
+  description = "ArgoCD namespace"
+  value       = module.argocd.namespace
+}
+
+output "argocd_release_name" {
+  description = "ArgoCD Helm release name"
+  value       = module.argocd.release_name
+}
+
+output "argocd_chart_version" {
+  description = "ArgoCD chart version deployed"
+  value       = module.argocd.chart_version
+}
