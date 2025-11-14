@@ -4,6 +4,7 @@ resource "azurerm_kubernetes_cluster" "main" {
   resource_group_name = var.resource_group_name
   dns_prefix          = var.dns_prefix
   kubernetes_version  = var.kubernetes_version
+  oidc_issuer_enabled = true
 
   default_node_pool {
     name           = "default"
