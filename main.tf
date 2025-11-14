@@ -1,3 +1,4 @@
+# Updated 2025-11-14T22:42:34
 module "resource_group" {
   source = "./modules/resource-group"
 
@@ -31,4 +32,5 @@ module "argocd" {
   chart_version = "9.1.3"
 
   depends_on = [module.aks]
-}
+} # Updated Fri Nov 14 22:18:12 CET 2025
+# Trigger workflow Fri Nov 14 22:35:21 CET 2025
