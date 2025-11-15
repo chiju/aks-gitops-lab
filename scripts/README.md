@@ -5,69 +5,43 @@
 This project uses a dual-credential approach for secure GitOps operations:
 
 ### 1. Full Access (Main Branch Only)
-- **Script**: `setup-workload-identity.sh`
 - **Permissions**: Contributor role
 - **Usage**: Terraform apply operations on main branch
-- **Secrets**: 
-  - `AZURE_CLIENT_ID`
-  - `AZURE_TENANT_ID` 
-  - `AZURE_SUBSCRIPTION_ID`
 
-### 2. Read-Only Access (All Non-Main Branches)
-- **Script**: `setup-readonly-access.sh`
-- **Permissions**: Reader role + Storage Blob Data Reader
-- **Usage**: Terraform plan operations on feature branches
-- **Secrets**:
-  - `AZURE_CLIENT_ID_READONLY`
-  - `AZURE_TENANT_ID_READONLY`
-  - `AZURE_SUBSCRIPTION_ID_READONLY`
+### 2. Read-Only Access (Pull Requests)
+- **Permissions**: Reader + Storage Account Key Operator + Storage Blob Data Reader
+- **Usage**: Terraform plan operations on pull requests
 
 ## Setup Instructions
 
-1. **Bootstrap Backend Storage**:
-   ```bash
-   ./scripts/bootstrap-backend.sh
-   ```
+**For new repos, run just one script:**
+```bash
+./scripts/setup-complete-access.sh
+```
 
-2. **Setup Full Access (Main Branch)**:
-   ```bash
-   ./scripts/setup-workload-identity.sh
-   ```
+This creates:
+- ✅ Full access app for main branch
+- ✅ Read-only app for pull requests
+- ✅ All necessary role assignments
+- ✅ Federated credentials
 
-3. **Setup Read-Only Access (All Other Branches)**:
-   ```bash
-   ./scripts/setup-readonly-access.sh
-   ```
+## GitHub Secrets Needed
 
-4. **Add GitHub Secrets**:
-   - Go to your repository settings
-   - Add all 6 secrets from both scripts
-   - The workflow will automatically use the correct credentials
+Add these 4 secrets to your repository:
+- `AZURE_CLIENT_ID` (full access)
+- `AZURE_CLIENT_ID_READONLY` (read-only)
+- `AZURE_TENANT_ID` (shared)
+- `AZURE_SUBSCRIPTION_ID` (shared)
 
 ## How It Works
 
-### Terraform Plan Permissions
-- **Read access** to Azure resources for comparison
-- **Read access** to state file in storage account
-- **No write access** needed (plan doesn't modify state)
-- **No locking write access** needed (plan is read-only)
-
 ### Branch-Based Authentication
-- **Main branch**: Uses full access credentials for apply operations
-- **Feature branches**: Uses read-only credentials for plan operations
+- **Main branch push**: Uses full access credentials for apply operations
 - **Pull requests**: Uses read-only credentials for plan operations
 
-### Federated Credentials
-- **Main branch**: Specific credential for `refs/heads/main`
-- **All other branches**: Wildcard credential for `refs/heads/*`
-- **Pull requests**: Specific credential for pull request events
-
-## Legacy Script (Deprecated)
-- `add-branch-credential.sh`: Adds individual branch access (no longer needed)
-
-## Security Benefits
+### Security Benefits
 - ✅ No manual branch setup required
-- ✅ Automatic read-only access for all feature branches
+- ✅ Automatic read-only access for all pull requests
 - ✅ Full access restricted to main branch only
 - ✅ No service principal keys stored in GitHub
 - ✅ Azure Workload Identity for secure authentication

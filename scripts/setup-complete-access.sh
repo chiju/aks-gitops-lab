@@ -64,6 +64,12 @@ if [ -n "$STORAGE_ACCOUNT" ] && [ -n "$RESOURCE_GROUP" ]; then
     --assignee $READONLY_APP_ID \
     --role "Storage Blob Data Reader" \
     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
+  
+  echo "Granting Storage Account Key Operator access for terraform init..."
+  az role assignment create \
+    --assignee $READONLY_APP_ID \
+    --role "Storage Account Key Operator Service Role" \
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
 else
   echo "⚠️  Could not find storage account info in backend.tf"
 fi
