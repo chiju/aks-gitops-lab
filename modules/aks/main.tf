@@ -23,12 +23,6 @@ resource "azurerm_kubernetes_cluster" "main" {
     type = "SystemAssigned"
   }
 
-  lifecycle {
-    ignore_changes = [
-      default_node_pool[0].node_count
-    ]
-  }
-
   network_profile {
     network_plugin = "azure"
     service_cidr   = "172.16.0.0/16"
