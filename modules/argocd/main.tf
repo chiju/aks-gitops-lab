@@ -8,15 +8,20 @@ resource "helm_release" "argocd" {
   create_namespace = true
   timeout          = 600
 
-  set {
-    name  = "server.service.type"
-    value = "ClusterIP"
-  }
-
-  set {
-    name  = "configs.cm.timeout\\.reconciliation"
-    value = "30s"
-  }
+  values = [
+    yamlencode({
+      configs = {
+        cm = {
+          "timeout.reconciliation" = "30s"
+        }
+      }
+      server = {
+        service = {
+          type = "ClusterIP"
+        }
+      }
+    })
+  ]
 }
 
 resource "helm_release" "argocd_apps" {
