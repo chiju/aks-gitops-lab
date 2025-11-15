@@ -39,7 +39,6 @@ resource "azurerm_kubernetes_cluster" "main" {
     Environment = "Lab"
     ManagedBy   = "Terraform"
     Purpose     = "GitOps-Demo"
-    TestBranch  = "add-apps"
   }
 }
 
