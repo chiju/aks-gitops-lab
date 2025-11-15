@@ -27,7 +27,7 @@ provider "helm" {
     host                   = module.aks.kube_config.host
     cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
     exec = {
-      api_version = "client.authentication.k8s.io/v1beta1"
+      api_version = "client.authentication.k8s.io/__internal"
       command     = "az"
       args = [
         "aks",
@@ -44,7 +44,7 @@ provider "kubernetes" {
   host                   = module.aks.kube_config.host
   cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
   exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
+    api_version = "client.authentication.k8s.io/__internal"
     command     = "az"
     args = [
       "aks",
