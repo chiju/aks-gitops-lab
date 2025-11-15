@@ -17,13 +17,13 @@ module "vnet" {
 module "aks" {
   source = "./modules/aks"
 
-  name                       = "${var.resource_group_name}-aks"
-  location                   = module.resource_group.location
-  resource_group_name        = module.resource_group.name
-  dns_prefix                 = var.resource_group_name
-  subnet_id                  = module.vnet.aks_subnet_id
-  kubernetes_version         = var.kubernetes_version
-  admin_group_object_ids     = var.aks_admin_group_object_ids
+  name                   = "${var.resource_group_name}-aks"
+  location               = module.resource_group.location
+  resource_group_name    = module.resource_group.name
+  dns_prefix             = var.resource_group_name
+  subnet_id              = module.vnet.aks_subnet_id
+  kubernetes_version     = var.kubernetes_version
+  admin_group_object_ids = var.aks_admin_group_object_ids
 }
 
 # Data source to ensure cluster is ready
