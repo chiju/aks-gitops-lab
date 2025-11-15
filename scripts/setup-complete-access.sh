@@ -1,0 +1,93 @@
+#!/bin/bash
+set -e
+
+# Variables
+GITHUB_ORG="chiju"
+GITHUB_REPO="aks-gitops-lab"
+FULL_ACCESS_APP="aks-gitops-lab-github"
+READONLY_APP="aks-gitops-lab-readonly"
+
+echo "🚀 Setting up complete Azure Workload Identity access..."
+
+# Get subscription and tenant info
+SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+TENANT_ID=$(az account show --query tenantId -o tsv)
+
+echo "Subscription ID: $SUBSCRIPTION_ID"
+echo "Tenant ID: $TENANT_ID"
+
+# 1. Create Full Access App (Main Branch)
+echo ""
+echo "1️⃣ Creating full access application for main branch..."
+FULL_APP_ID=$(az ad app create --display-name $FULL_ACCESS_APP --query appId -o tsv)
+echo "Full Access App ID: $FULL_APP_ID"
+
+az ad sp create --id $FULL_APP_ID
+
+# Assign Contributor role
+az role assignment create \
+  --role Contributor \
+  --assignee $FULL_APP_ID \
+  --scope /subscriptions/$SUBSCRIPTION_ID
+
+# Create federated credential for main branch
+az ad app federated-credential create \
+  --id $FULL_APP_ID \
+  --parameters '{
+    "name": "main-branch",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:'$GITHUB_ORG'/'$GITHUB_REPO':ref:refs/heads/main",
+    "audiences": ["api://AzureADTokenExchange"]
+  }'
+
+# 2. Create Read-Only App (Feature Branches)
+echo ""
+echo "2️⃣ Creating read-only application for feature branches..."
+READONLY_APP_ID=$(az ad app create --display-name $READONLY_APP --query appId -o tsv)
+echo "Read-Only App ID: $READONLY_APP_ID"
+
+az ad sp create --id $READONLY_APP_ID
+
+# Assign Reader role
+az role assignment create \
+  --role Reader \
+  --assignee $READONLY_APP_ID \
+  --scope /subscriptions/$SUBSCRIPTION_ID
+
+# Grant Storage Blob Data Reader access
+STORAGE_ACCOUNT=$(grep 'storage_account_name' backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
+RESOURCE_GROUP=$(grep 'resource_group_name' backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
+
+if [ -n "$STORAGE_ACCOUNT" ] && [ -n "$RESOURCE_GROUP" ]; then
+  echo "Granting Storage Blob Data Reader access..."
+  az role assignment create \
+    --assignee $READONLY_APP_ID \
+    --role "Storage Blob Data Reader" \
+    --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
+else
+  echo "⚠️  Could not find storage account info in backend.tf"
+fi
+
+# Create federated credential for pull requests
+az ad app federated-credential create \
+  --id $READONLY_APP_ID \
+  --parameters '{
+    "name": "pull-requests-readonly",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:'$GITHUB_ORG'/'$GITHUB_REPO':pull_request",
+    "audiences": ["api://AzureADTokenExchange"]
+  }'
+
+echo ""
+echo "✅ Complete access setup finished!"
+echo ""
+echo "📋 Add these 4 GitHub secrets:"
+echo "AZURE_CLIENT_ID: $FULL_APP_ID"
+echo "AZURE_CLIENT_ID_READONLY: $READONLY_APP_ID"
+echo "AZURE_TENANT_ID: $TENANT_ID"
+echo "AZURE_SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
+echo ""
+echo "🔧 For each new feature branch, run:"
+echo "./scripts/add-branch-access.sh [branch-name]"
+echo ""
+echo "Go to: https://github.com/$GITHUB_ORG/$GITHUB_REPO/settings/secrets/actions"
