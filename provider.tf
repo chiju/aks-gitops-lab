@@ -25,13 +25,33 @@ provider "azurerm" {
 provider "helm" {
   kubernetes = {
     host                   = module.aks.kube_config.host
-    token                  = module.aks.kube_config.password
     cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "az"
+      args = [
+        "aks",
+        "get-credentials",
+        "--resource-group", "aks-gitops-lab",
+        "--name", "aks-gitops-lab-aks",
+        "--format", "exec"
+      ]
+    }
   }
 }
 
 provider "kubernetes" {
   host                   = module.aks.kube_config.host
-  token                  = module.aks.kube_config.password
   cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
+  exec = {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "az"
+    args = [
+      "aks",
+      "get-credentials",
+      "--resource-group", "aks-gitops-lab",
+      "--name", "aks-gitops-lab-aks",
+      "--format", "exec"
+    ]
+  }
 }
