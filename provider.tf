@@ -1,3 +1,4 @@
+# Fixed service principal permissions for Helm
 terraform {
   required_providers {
     azurerm = {
