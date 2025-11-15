@@ -29,7 +29,7 @@ module "aks" {
 data "azurerm_kubernetes_cluster" "main" {
   name                = module.aks.cluster_name
   resource_group_name = module.resource_group.name
-  
+
   depends_on = [module.aks]
 }
 

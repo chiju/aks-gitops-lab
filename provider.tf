@@ -22,7 +22,7 @@ provider "azurerm" {
 }
 
 provider "helm" {
-  kubernetes {
+  kubernetes = {
     host                   = try(module.aks.kube_config.host, null)
     client_certificate     = try(base64decode(module.aks.kube_config.client_certificate), null)
     client_key             = try(base64decode(module.aks.kube_config.client_key), null)
