@@ -52,10 +52,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Azure Login
+    - name: Azure Login (Main Branch - Full Access)
+      if: github.ref == 'refs/heads/main'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Azure Login (Non-Main Branch - Read Only)
+      if: github.ref != 'refs/heads/main'
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID_READONLY }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
@@ -107,7 +116,7 @@ jobs:
         fi
 
     - name: Save Plan Artifact
-      if: steps.plan.outputs.exitcode == 2
+      if: steps.plan.outputs.exitcode == 2 && github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v4
       with:
         name: terraform-plan
@@ -135,7 +144,8 @@ jobs:
 
           </details>
 
-          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+          *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*
+          *Access Level: Read-Only (Plan Only)*`;
 
           github.rest.issues.createComment({
             issue_number: context.issue.number,
@@ -154,7 +164,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Azure Login
+    - name: Azure Login (Main Branch Only)
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
