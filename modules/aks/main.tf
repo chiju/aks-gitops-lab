@@ -1,11 +1,15 @@
 resource "azurerm_kubernetes_cluster" "main" {
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  dns_prefix          = var.dns_prefix
-  kubernetes_version  = var.kubernetes_version
-  oidc_issuer_enabled = true
+  name                              = var.name
+  location                          = var.location
+  resource_group_name               = var.resource_group_name
+  dns_prefix                        = var.dns_prefix
+  kubernetes_version                = var.kubernetes_version
+  oidc_issuer_enabled               = true
   role_based_access_control_enabled = true
+  azure_active_directory_role_based_access_control {
+    managed            = true
+    azure_rbac_enabled = true
+  }
 
   default_node_pool {
     name           = "default"
@@ -16,11 +20,6 @@ resource "azurerm_kubernetes_cluster" "main" {
 
   identity {
     type = "SystemAssigned"
-  }
-
-  azure_active_directory_role_based_access_control {
-    managed = true
-    azure_rbac_enabled = true
   }
 
   network_profile {
