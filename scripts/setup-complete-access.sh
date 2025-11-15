@@ -87,13 +87,22 @@ az ad app federated-credential create \
 echo ""
 echo "✅ Complete access setup finished!"
 echo ""
-echo "📋 Add these 4 GitHub secrets:"
-echo "AZURE_CLIENT_ID: $FULL_APP_ID"
-echo "AZURE_CLIENT_ID_READONLY: $READONLY_APP_ID"
-echo "AZURE_TENANT_ID: $TENANT_ID"
-echo "AZURE_SUBSCRIPTION_ID: $SUBSCRIPTION_ID"
+echo "📋 Adding GitHub secrets automatically..."
+
+# Get readonly SP object ID
+READONLY_OBJECT_ID=$(az ad sp list --display-name $READONLY_APP --query "[0].id" -o tsv)
+
+# Add all secrets
+gh secret set AZURE_CLIENT_ID -b "$FULL_APP_ID"
+gh secret set AZURE_CLIENT_ID_READONLY -b "$READONLY_APP_ID"
+gh secret set AZURE_TENANT_ID -b "$TENANT_ID"
+gh secret set AZURE_SUBSCRIPTION_ID -b "$SUBSCRIPTION_ID"
+gh secret set AZURE_READONLY_OBJECT_ID -b "$READONLY_OBJECT_ID"
+
+echo "✅ GitHub secrets added!"
 echo ""
-echo "🔧 For each new feature branch, run:"
-echo "./scripts/add-branch-access.sh [branch-name]"
+echo "⚠️  You still need to add manually:"
+echo "gh secret set GIT_USERNAME -b \"<your-github-username>\""
+echo "gh secret set GIT_TOKEN -b \"<your-github-pat>\""
 echo ""
-echo "Go to: https://github.com/$GITHUB_ORG/$GITHUB_REPO/settings/secrets/actions"
+echo "🚀 After adding GIT secrets, push to main to deploy!"

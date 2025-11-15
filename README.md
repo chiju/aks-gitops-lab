@@ -38,7 +38,7 @@ This creates:
 ./scripts/setup-complete-access.sh
 ```
 
-This creates:
+This creates and configures:
 - Full access service principal (main branch)
   - Contributor at subscription level
   - Federated credential for main branch
@@ -46,14 +46,11 @@ This creates:
   - Reader at subscription level
   - Storage access for state
   - Federated credential for pull requests
+- **Automatically adds 5 GitHub secrets**
 
-**Action Required:** Add these 6 GitHub secrets:
+**Action Required:** Add these 2 GitHub secrets manually:
 
 ```bash
-gh secret set AZURE_CLIENT_ID -b "<full-access-app-id>"
-gh secret set AZURE_CLIENT_ID_READONLY -b "<readonly-app-id>"
-gh secret set AZURE_TENANT_ID -b "<tenant-id>"
-gh secret set AZURE_SUBSCRIPTION_ID -b "<subscription-id>"
 gh secret set GIT_USERNAME -b "<your-github-username>"
 gh secret set GIT_TOKEN -b "<your-github-pat>"
 ```

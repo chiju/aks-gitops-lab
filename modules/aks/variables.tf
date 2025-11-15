@@ -45,3 +45,9 @@ variable "admin_group_object_ids" {
   type        = list(string)
   default     = []
 }
+
+variable "readonly_client_id" {
+  description = "Client ID of read-only service principal for PR workflows"
+  type        = string
+  default     = ""
+}

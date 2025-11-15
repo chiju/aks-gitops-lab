@@ -24,6 +24,7 @@ module "aks" {
   subnet_id              = module.vnet.aks_subnet_id
   kubernetes_version     = var.kubernetes_version
   admin_group_object_ids = var.aks_admin_group_object_ids
+  readonly_client_id     = var.readonly_client_id
 }
 
 # Data source to ensure cluster is ready
