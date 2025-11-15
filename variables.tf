@@ -10,6 +10,12 @@ variable "location" {
   default     = "West Europe"
 }
 
+variable "subscription_id" {
+  description = "Azure subscription ID"
+  type        = string
+  default     = "d2c2211d-193c-47e7-8247-85465d5ff1a6"
+}
+
 variable "kubernetes_version" {
   description = "Kubernetes version"
   type        = string
