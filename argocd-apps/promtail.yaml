@@ -1,20 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: example-app
+  name: promtail
   namespace: argocd
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
     repoURL: https://github.com/chiju/aks-gitops-lab.git
     targetRevision: main
-    path: example-app
+    path: apps/promtail
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: loki
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+    - CreateNamespace=true
