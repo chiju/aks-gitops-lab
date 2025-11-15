@@ -6,10 +6,6 @@ resource "azurerm_kubernetes_cluster" "main" {
   kubernetes_version                = var.kubernetes_version
   oidc_issuer_enabled               = true
   role_based_access_control_enabled = true
-  azure_active_directory_role_based_access_control {
-    managed            = true
-    azure_rbac_enabled = true
-  }
 
   default_node_pool {
     name           = "default"
