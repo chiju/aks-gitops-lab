@@ -7,7 +7,7 @@ spec:
   scaleTargetRef:
     name: {{ .Chart.Name }}
   minReplicaCount: 2
-  maxReplicaCount: 10
+  maxReplicaCount: 2
   triggers:
   - type: cpu
     metricType: Utilization
