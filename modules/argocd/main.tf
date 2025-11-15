@@ -37,7 +37,7 @@ resource "helm_release" "argocd_apps" {
   values = [
     yamlencode({
       applications = {
-        app-of-apps = {
+        core-apps = {
           namespace  = var.namespace
           finalizers = ["resources-finalizer.argocd.argoproj.io"]
           project    = "default"
