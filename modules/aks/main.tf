@@ -1,4 +1,5 @@
 resource "azurerm_kubernetes_cluster" "main" {
+  # Updated to test PR workflow with proper permissions
   name                              = var.name
   location                          = var.location
   resource_group_name               = var.resource_group_name
