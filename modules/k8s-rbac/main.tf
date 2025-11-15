@@ -11,7 +11,7 @@ resource "kubernetes_cluster_role_binding" "github_actions_admin" {
   
   subject {
     kind      = "User"
-    name      = "d05a88f1-a501-427a-be8d-39a47ef4b29e"
+    name      = var.service_principal_object_id
     api_group = "rbac.authorization.k8s.io"
   }
 }
