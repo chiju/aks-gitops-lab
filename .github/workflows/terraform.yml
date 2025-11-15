@@ -197,11 +197,8 @@ jobs:
 
     - name: Post-deployment Tests
       run: |
-        # Install kubelogin for Azure AD authentication
-        az aks install-cli
-        
-        # Wait for AKS to be ready
-        az aks get-credentials --resource-group aks-gitops-lab --name aks-gitops-lab-aks --overwrite-existing
+        # Use admin credentials for CI/CD
+        az aks get-credentials --resource-group aks-gitops-lab --name aks-gitops-lab-aks --admin --overwrite-existing
         kubectl wait --for=condition=Ready nodes --all --timeout=300s
         kubectl get nodes
         

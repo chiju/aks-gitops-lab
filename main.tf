@@ -33,14 +33,6 @@ data "azurerm_kubernetes_cluster" "main" {
   depends_on = [module.aks]
 }
 
-module "k8s_rbac" {
-  source = "./modules/k8s-rbac"
-  
-  service_principal_object_id = "d05a88f1-a501-427a-be8d-39a47ef4b29e"
-  
-  depends_on = [module.aks]
-}
-
 module "argocd" {
   source = "./modules/argocd"
 
