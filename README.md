@@ -6,3 +6,4 @@ Infrastructure setup for AKS with GitOps using ArgoCD.
 # Test read-only access
 # Test with Azure RBAC permissions
 # Test with admin permissions
+# Fixed service principal permissions for Helm deployment
