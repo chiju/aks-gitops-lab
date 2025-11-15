@@ -57,4 +57,4 @@ resource "azurerm_role_assignment" "readonly_cluster_admin" {
   scope                = azurerm_kubernetes_cluster.main.id
   role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
   principal_id         = var.readonly_client_id
-}# Test prometheus deployment
+} # Test prometheus deployment
