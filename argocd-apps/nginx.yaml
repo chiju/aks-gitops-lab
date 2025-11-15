@@ -11,6 +11,10 @@ spec:
     targetRevision: 18.2.4
     helm:
       values: |
+        image:
+          registry: docker.io
+          repository: nginx
+          tag: 1.27-alpine
         replicaCount: 2
         service:
           type: LoadBalancer
