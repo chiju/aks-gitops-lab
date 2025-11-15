@@ -13,3 +13,7 @@ spec:
     metricType: Utilization
     metadata:
       value: "50"
+  - type: memory
+    metricType: Utilization
+    metadata:
+      value: "70"
