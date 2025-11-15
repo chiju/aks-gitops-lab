@@ -193,10 +193,7 @@ jobs:
         name: terraform-plan
 
     - name: Terraform Apply
-      run: |
-        terraform apply -auto-approve tfplan \
-          -var="github_username=${{ secrets.GIT_USERNAME }}" \
-          -var="github_token=${{ secrets.GIT_TOKEN }}"
+      run: terraform apply -auto-approve tfplan
 
     - name: Post-deployment Tests
       run: |
