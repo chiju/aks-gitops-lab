@@ -22,17 +22,37 @@ provider "azurerm" {
 }
 
 provider "helm" {
-  kubernetes = can(module.aks.kube_config.host) ? {
-    host                   = module.aks.kube_config.host
-    client_certificate     = base64decode(module.aks.kube_config.client_certificate)
-    client_key             = base64decode(module.aks.kube_config.client_key)
-    cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
-  } : {}
+  kubernetes = {
+    host                   = try(data.azurerm_kubernetes_cluster.main.fqdn, "")
+    cluster_ca_certificate = try(base64decode(data.azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate), "")
+    
+    exec {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "az"
+      args = [
+        "aks",
+        "get-credentials",
+        "--resource-group", var.resource_group_name,
+        "--name", "${var.resource_group_name}-aks",
+        "--format", "exec"
+      ]
+    }
+  }
 }
 
 provider "kubernetes" {
-  host                   = try(module.aks.kube_config.host, null)
-  client_certificate     = try(base64decode(module.aks.kube_config.client_certificate), null)
-  client_key             = try(base64decode(module.aks.kube_config.client_key), null)
-  cluster_ca_certificate = try(base64decode(module.aks.kube_config.cluster_ca_certificate), null)
+  host                   = try(data.azurerm_kubernetes_cluster.main.fqdn, "")
+  cluster_ca_certificate = try(base64decode(data.azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate), "")
+  
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "az"
+    args = [
+      "aks",
+      "get-credentials",
+      "--resource-group", var.resource_group_name,
+      "--name", "${var.resource_group_name}-aks",
+      "--format", "exec"
+    ]
+  }
 }
