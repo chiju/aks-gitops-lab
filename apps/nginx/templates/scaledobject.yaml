@@ -1,0 +1,15 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ .Chart.Name }}-scaler
+  namespace: nginx
+spec:
+  scaleTargetRef:
+    name: {{ .Chart.Name }}
+  minReplicaCount: 2
+  maxReplicaCount: 10
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "50"
