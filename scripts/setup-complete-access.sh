@@ -30,6 +30,12 @@ az role assignment create \
   --assignee $FULL_APP_ID \
   --scope /subscriptions/$SUBSCRIPTION_ID
 
+# Assign User Access Administrator role (needed for role assignments in Terraform)
+az role assignment create \
+  --role "User Access Administrator" \
+  --assignee $FULL_APP_ID \
+  --scope /subscriptions/$SUBSCRIPTION_ID
+
 # Create federated credential for main branch
 az ad app federated-credential create \
   --id $FULL_APP_ID \
