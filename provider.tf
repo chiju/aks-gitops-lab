@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "3.1.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.38.0"
+    }
   }
 }
 
@@ -19,9 +23,34 @@ provider "azurerm" {
 
 provider "helm" {
   kubernetes = {
-    host                   = try(module.aks.kube_config.host, "")
-    client_certificate     = try(base64decode(module.aks.kube_config.client_certificate), "")
-    client_key             = try(base64decode(module.aks.kube_config.client_key), "")
-    cluster_ca_certificate = try(base64decode(module.aks.kube_config.cluster_ca_certificate), "")
+    host = "https://${var.resource_group_name}-aks.hcp.westeurope.azmk8s.io"
+    
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "az"
+      args = [
+        "aks",
+        "get-credentials",
+        "--resource-group", var.resource_group_name,
+        "--name", "${var.resource_group_name}-aks",
+        "--format", "exec"
+      ]
+    }
+  }
+}
+
+provider "kubernetes" {
+  host = "https://${var.resource_group_name}-aks.hcp.westeurope.azmk8s.io"
+  
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "az"
+    args = [
+      "aks",
+      "get-credentials",
+      "--resource-group", var.resource_group_name,
+      "--name", "${var.resource_group_name}-aks",
+      "--format", "exec"
+    ]
   }
 }

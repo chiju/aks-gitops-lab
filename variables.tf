@@ -15,3 +15,16 @@ variable "kubernetes_version" {
   type        = string
   default     = "1.34"
 }
+
+variable "github_username" {
+  description = "GitHub username for ArgoCD repository access"
+  type        = string
+  default     = ""
+}
+
+variable "github_token" {
+  description = "GitHub token for ArgoCD repository access"
+  type        = string
+  default     = ""
+  sensitive   = true
+}

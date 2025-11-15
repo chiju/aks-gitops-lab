@@ -3,13 +3,37 @@ variable "namespace" {
   type        = string
 }
 
-variable "chart_version" {
+variable "argocd_version" {
   description = "ArgoCD Helm chart version"
   type        = string
 }
 
-variable "service_type" {
-  description = "Kubernetes service type for ArgoCD server"
+variable "git_repo_url" {
+  description = "Git repository URL for ArgoCD applications"
   type        = string
-  default     = "ClusterIP"
+}
+
+variable "git_target_revision" {
+  description = "Git branch or tag to track"
+  type        = string
+  default     = "main"
+}
+
+variable "git_apps_path" {
+  description = "Path in git repository containing ArgoCD application manifests"
+  type        = string
+  default     = "argocd-apps"
+}
+
+variable "github_username" {
+  description = "GitHub username for repository access (optional for public repos)"
+  type        = string
+  default     = ""
+}
+
+variable "github_token" {
+  description = "GitHub token for repository access (optional for public repos)"
+  type        = string
+  default     = ""
+  sensitive   = true
 }
