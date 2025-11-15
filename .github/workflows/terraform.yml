@@ -108,7 +108,8 @@ jobs:
         terraform plan -detailed-exitcode -no-color -out=tfplan \
           -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
           -var="github_username=${{ secrets.GIT_USERNAME }}" \
-          -var="github_token=${{ secrets.GIT_TOKEN }}"
+          -var="github_token=${{ secrets.GIT_TOKEN }}" \
+          -var="readonly_client_id=${{ secrets.AZURE_READONLY_OBJECT_ID }}"
         exitcode=$?
         echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
         if [ $exitcode -eq 1 ]; then

@@ -39,3 +39,9 @@ variable "github_token" {
   default     = ""
   sensitive   = true
 }
+
+variable "readonly_client_id" {
+  description = "Object ID of read-only service principal for PR workflows"
+  type        = string
+  default     = ""
+}

@@ -39,6 +39,21 @@ resource "azurerm_kubernetes_cluster" "main" {
     Environment = "Lab"
     ManagedBy   = "Terraform"
     Purpose     = "GitOps-Demo"
-    TestBranch  = "feature-test"
+    TestBranch  = "add-apps"
   }
+}
+
+# Grant read-only SP access to cluster credentials for terraform plan
+resource "azurerm_role_assignment" "readonly_cluster_user" {
+  count                = var.readonly_client_id != "" ? 1 : 0
+  scope                = azurerm_kubernetes_cluster.main.id
+  role_definition_name = "Azure Kubernetes Service Cluster User Role"
+  principal_id         = var.readonly_client_id
+}
+
+resource "azurerm_role_assignment" "readonly_cluster_admin" {
+  count                = var.readonly_client_id != "" ? 1 : 0
+  scope                = azurerm_kubernetes_cluster.main.id
+  role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
+  principal_id         = var.readonly_client_id
 }
