@@ -42,6 +42,8 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 }
 
+# Role assignments for readonly SP
+
 # Grant read-only SP access to cluster credentials for terraform plan
 resource "azurerm_role_assignment" "readonly_cluster_user" {
   count                = var.readonly_client_id != "" ? 1 : 0
