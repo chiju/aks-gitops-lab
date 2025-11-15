@@ -16,6 +16,12 @@ variable "kubernetes_version" {
   default     = "1.34"
 }
 
+variable "aks_admin_group_object_ids" {
+  description = "Azure AD group object IDs for AKS cluster admins"
+  type        = list(string)
+  default     = []
+}
+
 variable "github_username" {
   description = "GitHub username for ArgoCD repository access"
   type        = string

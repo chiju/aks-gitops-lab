@@ -39,3 +39,9 @@ variable "subnet_id" {
   description = "ID of the subnet for AKS nodes"
   type        = string
 }
+
+variable "admin_group_object_ids" {
+  description = "Azure AD group object IDs for cluster admins"
+  type        = list(string)
+  default     = []
+}
