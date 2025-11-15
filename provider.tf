@@ -23,8 +23,7 @@ provider "azurerm" {
 
 provider "helm" {
   kubernetes = {
-    host                   = try(data.azurerm_kubernetes_cluster.main.fqdn, "")
-    cluster_ca_certificate = try(base64decode(data.azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate), "")
+    host = "https://${var.resource_group_name}-aks.hcp.westeurope.azmk8s.io"
     
     exec = {
       api_version = "client.authentication.k8s.io/v1beta1"
@@ -41,8 +40,7 @@ provider "helm" {
 }
 
 provider "kubernetes" {
-  host                   = try(data.azurerm_kubernetes_cluster.main.fqdn, "")
-  cluster_ca_certificate = try(base64decode(data.azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate), "")
+  host = "https://${var.resource_group_name}-aks.hcp.westeurope.azmk8s.io"
   
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
