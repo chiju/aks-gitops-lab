@@ -24,34 +24,16 @@ provider "azurerm" {
 
 provider "helm" {
   kubernetes = {
-    host                   = module.aks.kube_config.host
-    cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
-    exec = {
-      api_version = "client.authentication.k8s.io/__internal"
-      command     = "az"
-      args = [
-        "aks",
-        "get-credentials",
-        "--resource-group", "aks-gitops-lab",
-        "--name", "aks-gitops-lab-aks",
-        "--format", "exec"
-      ]
-    }
+    host                   = module.aks.kube_admin_config.host
+    client_certificate     = base64decode(module.aks.kube_admin_config.client_certificate)
+    client_key             = base64decode(module.aks.kube_admin_config.client_key)
+    cluster_ca_certificate = base64decode(module.aks.kube_admin_config.cluster_ca_certificate)
   }
 }
 
 provider "kubernetes" {
-  host                   = module.aks.kube_config.host
-  cluster_ca_certificate = base64decode(module.aks.kube_config.cluster_ca_certificate)
-  exec {
-    api_version = "client.authentication.k8s.io/__internal"
-    command     = "az"
-    args = [
-      "aks",
-      "get-credentials",
-      "--resource-group", "aks-gitops-lab",
-      "--name", "aks-gitops-lab-aks",
-      "--format", "exec"
-    ]
-  }
+  host                   = module.aks.kube_admin_config.host
+  client_certificate     = base64decode(module.aks.kube_admin_config.client_certificate)
+  client_key             = base64decode(module.aks.kube_admin_config.client_key)
+  cluster_ca_certificate = base64decode(module.aks.kube_admin_config.cluster_ca_certificate)
 }

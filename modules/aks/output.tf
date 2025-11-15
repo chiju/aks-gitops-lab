@@ -20,6 +20,12 @@ output "kube_config" {
   sensitive   = true
 }
 
+output "kube_admin_config" {
+  description = "Kubernetes admin configuration object"
+  value       = azurerm_kubernetes_cluster.main.kube_admin_config.0
+  sensitive   = true
+}
+
 output "cluster_fqdn" {
   description = "FQDN of the AKS cluster"
   value       = azurerm_kubernetes_cluster.main.fqdn
