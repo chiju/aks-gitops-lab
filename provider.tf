@@ -8,6 +8,10 @@ terraform {
       source  = "hashicorp/helm"
       version = "3.1.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.38.0"
+    }
   }
 }
 
@@ -18,10 +22,17 @@ provider "azurerm" {
 }
 
 provider "helm" {
-  kubernetes = {
-    host                   = try(module.aks.kube_config.host, "")
-    client_certificate     = try(base64decode(module.aks.kube_config.client_certificate), "")
-    client_key             = try(base64decode(module.aks.kube_config.client_key), "")
-    cluster_ca_certificate = try(base64decode(module.aks.kube_config.cluster_ca_certificate), "")
+  kubernetes {
+    host                   = try(module.aks.kube_config.host, null)
+    client_certificate     = try(base64decode(module.aks.kube_config.client_certificate), null)
+    client_key             = try(base64decode(module.aks.kube_config.client_key), null)
+    cluster_ca_certificate = try(base64decode(module.aks.kube_config.cluster_ca_certificate), null)
   }
+}
+
+provider "kubernetes" {
+  host                   = try(module.aks.kube_config.host, null)
+  client_certificate     = try(base64decode(module.aks.kube_config.client_certificate), null)
+  client_key             = try(base64decode(module.aks.kube_config.client_key), null)
+  cluster_ca_certificate = try(base64decode(module.aks.kube_config.cluster_ca_certificate), null)
 }

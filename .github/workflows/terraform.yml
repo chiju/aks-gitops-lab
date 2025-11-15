@@ -105,7 +105,9 @@ jobs:
       id: plan
       run: |
         set +e
-        terraform plan -detailed-exitcode -no-color -out=tfplan
+        terraform plan -detailed-exitcode -no-color -out=tfplan \
+          -var="github_username=${{ secrets.GIT_USERNAME }}" \
+          -var="github_token=${{ secrets.GIT_TOKEN }}"
         exitcode=$?
         echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
         if [ $exitcode -eq 1 ]; then
@@ -191,7 +193,10 @@ jobs:
         name: terraform-plan
 
     - name: Terraform Apply
-      run: terraform apply -auto-approve tfplan
+      run: |
+        terraform apply -auto-approve tfplan \
+          -var="github_username=${{ secrets.GIT_USERNAME }}" \
+          -var="github_token=${{ secrets.GIT_TOKEN }}"
 
     - name: Post-deployment Tests
       run: |

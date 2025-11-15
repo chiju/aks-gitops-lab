@@ -25,12 +25,25 @@ module "aks" {
   kubernetes_version  = var.kubernetes_version
 }
 
+# Data source to ensure cluster is ready
+data "azurerm_kubernetes_cluster" "main" {
+  name                = module.aks.cluster_name
+  resource_group_name = module.resource_group.name
+  
+  depends_on = [module.aks]
+}
+
 module "argocd" {
   source = "./modules/argocd"
 
-  namespace     = "argocd"
-  chart_version = "9.1.3"
+  namespace           = "argocd"
+  argocd_version      = "9.1.3"
+  git_repo_url        = "https://github.com/chiju/aks-gitops-lab.git"
+  git_target_revision = "main"
+  git_apps_path       = "argocd-apps"
+  github_username     = var.github_username
+  github_token        = var.github_token
 
-  depends_on = [module.aks]
+  depends_on = [data.azurerm_kubernetes_cluster.main]
 } # Updated Fri Nov 14 22:18:12 CET 2025
 # Trigger workflow Fri Nov 14 22:35:21 CET 2025
