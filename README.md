@@ -2,294 +2,247 @@
 
 Complete Azure Kubernetes Service (AKS) infrastructure with GitOps using ArgoCD, fully automated via GitHub Actions and Terraform.
 
-## Architecture
+## What Gets Deployed
 
-- **Infrastructure as Code**: Terraform with modular design
+- **Infrastructure**: AKS cluster, VNet, Resource Group
 - **GitOps**: ArgoCD with app-of-apps pattern
-- **CI/CD**: GitHub Actions with dual-credential approach
-- **Security**: Azure Workload Identity, Azure RBAC, no stored secrets
+- **Applications**: nginx, keda, prometheus monitoring, promtail
+- **Automation**: Dual-credential CI/CD with GitHub Actions
 
 ## Prerequisites
 
-- Azure CLI installed and logged in (`az login`)
-- GitHub CLI installed and logged in (`gh auth login`)
-- Terraform installed (v1.13.5+)
-- kubectl installed
-- Git configured
+- Azure CLI (`az login`)
+- GitHub CLI (`gh auth login`)
+- Terraform (v1.13.5+)
+- kubectl
+- Git
 
-## Quick Start
+## Quick Start (3 Steps)
 
-### 1. Bootstrap Backend (One-time)
+### 1. Bootstrap Backend
 
 ```bash
 ./scripts/bootstrap-backend.sh
 ```
 
-This creates:
-- Resource group: `terraform-state-rg`
-- Storage account: `tfstate<random>`
-- Container: `tfstate`
+**Output:** Storage account name (e.g., `tfstate27a151e5`)
 
-**Action Required:** Update `backend.tf` with the storage account name from output.
+**Action:** Update `backend.tf` with the storage account name:
+```hcl
+storage_account_name = "tfstate27a151e5"  # Use your output
+```
 
-### 2. Setup Service Principals (One-time)
+### 2. Setup Service Principals
 
 ```bash
 ./scripts/setup-complete-access.sh
 ```
 
-This creates and configures:
-- Full access service principal (main branch)
-  - Contributor at subscription level
-  - Federated credential for main branch
-- Read-only service principal (PRs)
-  - Reader at subscription level
-  - Storage access for state
-  - Federated credential for pull requests
+**What it does:**
+- Creates 2 service principals (full-access + read-only)
+- Assigns Azure roles (Contributor, User Access Administrator, Reader)
+- Configures federated credentials for GitHub Actions
 - **Automatically adds 5 GitHub secrets**
 
-**Action Required:** Add these 2 GitHub secrets manually:
-
+**Action:** Add 2 secrets manually:
 ```bash
-gh secret set GIT_USERNAME -b "<your-github-username>"
-gh secret set GIT_TOKEN -b "<your-github-pat>"
+gh secret set GIT_USERNAME -b "your-github-username"
+gh secret set GIT_TOKEN -b "your-github-pat"
 ```
 
-### 3. Deploy via GitOps Workflow
-
-**Option A: Test with PR first (Recommended)**
-
-```bash
-# Create feature branch
-git checkout -b feature/test-deployment
-
-# Make a change (e.g., update a tag in modules/aks/main.tf)
-git add .
-git commit -m "Test deployment"
-git push -u origin feature/test-deployment
-
-# Create PR
-gh pr create --title "Test deployment" --body "Testing infrastructure"
-
-# PR workflow runs with read-only credentials (plan only)
-# Review the plan in PR comments
-
-# Merge to deploy
-gh pr merge --squash --delete-branch
-```
-
-**Option B: Direct to main**
+### 3. Deploy
 
 ```bash
 git add .
-git commit -m "Deploy infrastructure"
+git commit -m "Initial deployment"
 git push origin main
 ```
 
-## What Gets Deployed
+**That's it!** GitHub Actions will:
+- Run terraform plan
+- Deploy AKS cluster
+- Install ArgoCD
+- Deploy all applications
 
-### Infrastructure (Terraform)
-- Resource group: `aks-gitops-lab`
-- VNet with subnet
-- AKS cluster (1 node, Kubernetes 1.34)
-- ArgoCD (Helm chart)
+## Architecture
 
-### GitOps (ArgoCD)
-- App-of-apps pattern configured
-- Automatic sync enabled
-- Applications from `argocd-apps/` directory
+### Dual-Credential Approach
 
-## CI/CD Workflow
+**Pull Requests (Read-Only)**
+- Service Principal: `aks-gitops-lab-readonly`
+- Roles: Reader, Storage access, AKS Cluster Admin (read)
+- Action: `terraform plan` only
+- Purpose: Safe testing before merge
 
-### Pull Requests
-- ✅ Security scan (Trivy)
-- ✅ Terraform plan (read-only credentials)
-- ✅ Plan posted as PR comment
-- ❌ No apply
+**Main Branch (Full-Access)**
+- Service Principal: `aks-gitops-lab-github`
+- Roles: Contributor, User Access Administrator
+- Action: `terraform apply`
+- Purpose: Deploy infrastructure
 
-### Main Branch
-- ✅ Security scan
-- ✅ Terraform plan
-- ✅ Terraform apply (full credentials)
-- ✅ Post-deployment tests
+### GitOps Flow
+
+```
+PR → Plan (read-only) → Review → Merge → Apply (full-access) → ArgoCD syncs apps
+```
 
 ## Project Structure
 
 ```
 .
 ├── .github/workflows/
-│   ├── terraform.yml      # Main CI/CD workflow
-│   └── destroy.yml        # Destroy infrastructure
-├── argocd-apps/           # ArgoCD application manifests
-│   ├── example-app.yaml
-│   └── README.md
-├── modules/               # Terraform modules
+│   ├── terraform.yml      # Main CI/CD
+│   └── destroy.yml        # Cleanup
+├── apps/                  # Helm charts
+│   ├── nginx/
+│   ├── keda/
+│   ├── kube-prometheus-stack/
+│   └── promtail/
+├── argocd-apps/          # ArgoCD applications
+│   ├── nginx.yaml
+│   ├── keda.yaml
+│   ├── monitoring.yaml
+│   └── promtail.yaml
+├── modules/              # Terraform modules
 │   ├── aks/
 │   ├── argocd/
 │   ├── resource-group/
 │   └── vnet/
-├── scripts/               # Bootstrap scripts
+├── scripts/              # Setup scripts
 │   ├── bootstrap-backend.sh
 │   ├── setup-complete-access.sh
-│   ├── add-branch-access.sh
-│   └── grant-aks-access.sh
-├── backend.tf            # Terraform backend config
-├── main.tf               # Main Terraform config
-├── provider.tf           # Provider configuration
-├── variables.tf          # Input variables
-└── outputs.tf            # Output values
+│   └── cleanup-all.sh
+├── backend.tf
+├── main.tf
+└── README.md
 ```
 
 ## Adding Applications
 
-Add ArgoCD application manifests to `argocd-apps/`:
+1. Create Helm chart in `apps/your-app/`
+2. Create ArgoCD app in `argocd-apps/your-app.yaml`:
 
 ```yaml
-# argocd-apps/my-app.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-app
+  name: your-app
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/your-org/your-repo.git
     targetRevision: main
-    path: my-app
+    path: apps/your-app
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: your-namespace
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+    - CreateNamespace=true
 ```
 
-Commit and push - ArgoCD will automatically deploy!
+3. Commit and push - ArgoCD deploys automatically!
 
 ## Accessing the Cluster
 
 ```bash
-# Get kubectl credentials
+# Get credentials
 az aks get-credentials --resource-group aks-gitops-lab --name aks-gitops-lab-aks --admin
 
 # Check cluster
 kubectl get nodes
-
-# Check ArgoCD
 kubectl get pods -n argocd
 kubectl get applications -n argocd
+
+# Access ArgoCD UI
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+# Open: https://localhost:8080
+# Username: admin
+# Password: kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath="{.data.password}" | base64 -d
 ```
 
-## Destroying Infrastructure
+## Cleanup
 
 ```bash
-# Via GitHub Actions
-gh workflow run destroy.yml -f confirm=destroy
-
-# Or locally
-terraform destroy \
-  -var="subscription_id=$AZURE_SUBSCRIPTION_ID" \
-  -var="github_username=$GIT_USERNAME" \
-  -var="github_token=$GIT_TOKEN"
+# Complete cleanup (deletes everything)
+./scripts/cleanup-all.sh
 ```
 
-## Permissions Model
-
-### Full Access (Main Branch)
-- **Role**: Contributor at subscription level
-- **Purpose**: Create/modify/delete any resource
-- **Usage**: Terraform apply on main branch
-- **Why subscription-level**: Terraform needs to create resource groups
-
-### Read-Only (Pull Requests)
-- **Role**: Reader at subscription level
-- **Purpose**: Read resources for terraform plan
-- **Usage**: Terraform plan on PRs
-- **Additional**: Storage access for state file
-
-## Security Features
-
-- ✅ Azure Workload Identity (no stored credentials)
-- ✅ Federated credentials (OIDC)
-- ✅ Azure RBAC enabled on AKS
-- ✅ Separate credentials for read/write
-- ✅ Security scanning with Trivy
-- ✅ Terraform state encryption
-- ✅ Admin credentials for automation
+This removes:
+- Service principals
+- GitHub secrets
+- Backend storage
+- Resource groups
+- Local state files
 
 ## Troubleshooting
 
-### Issue: Terraform plan fails with subscription error
-**Solution**: Ensure `AZURE_SUBSCRIPTION_ID` secret is set correctly
+### Issue: PR workflow fails with permission error
+**Solution:** Ensure readonly SP has AKS Cluster Admin role (automated in Terraform)
 
-### Issue: ArgoCD not syncing applications
-**Solution**: 
-- Check GitHub token has repo access
-- Verify `git_repo_url` in main.tf is correct
-- Check ArgoCD logs: `kubectl logs -n argocd -l app.kubernetes.io/name=argocd-server`
+### Issue: ArgoCD not syncing apps
+**Solution:** 
+- Check GitHub token: `kubectl get secret argocd-repo -n argocd -o yaml`
+- Verify repo URL in `main.tf`
 
-### Issue: kubectl access denied
-**Solution**: Use admin credentials:
-```bash
-az aks get-credentials --resource-group aks-gitops-lab --name aks-gitops-lab-aks --admin
-```
+### Issue: Pods pending in monitoring namespace
+**Solution:** Single node cluster has limited resources. Increase node count in `modules/aks/variables.tf`
 
-### Issue: Pipeline fails on resource group creation
-**Solution**: Resource group already exists. Either:
-- Delete it: `az group delete --name aks-gitops-lab --yes`
-- Or import it into Terraform state
+## Permissions Explained
 
-## Advanced Configuration
+### Why Subscription-Level?
 
-### Change Kubernetes Version
+Terraform needs to create resource groups, which requires subscription-level permissions. Scoped permissions would require pre-existing resource groups, breaking automation.
 
-Edit `variables.tf`:
-```hcl
-variable "kubernetes_version" {
-  default     = "1.35"  # Update version
-}
-```
+### Full-Access Roles
 
-### Add Admin Group
+- **Contributor**: Create/modify/delete resources
+- **User Access Administrator**: Create role assignments (for readonly SP)
 
-Edit `variables.tf`:
-```hcl
-variable "aks_admin_group_object_ids" {
-  default     = ["<azure-ad-group-object-id>"]
-}
-```
+### Read-Only Roles
 
-### Change Node Count
+- **Reader**: Read all resources
+- **Storage Blob Data Reader**: Read Terraform state
+- **Storage Account Key Operator**: Initialize Terraform backend
+- **AKS Cluster Admin**: Read cluster credentials for plan
 
-Edit `modules/aks/variables.tf`:
-```hcl
-variable "node_count" {
-  default     = 3  # Increase nodes
-}
-```
+## Cost
 
-## Cost Optimization
+- **AKS**: 1 x Standard_B2s node (~$30/month)
+- **Storage**: Standard_LRS (~$0.05/month)
+- **Total**: ~$30-35/month
 
-- Default: 1 x Standard_B2s node (~$30/month)
-- Storage: Standard_LRS (~$0.05/month)
-- Total: ~$30-35/month
+Destroy when not in use to save costs.
 
-To reduce costs:
-- Use smaller VM size
-- Destroy when not in use
+## Security Features
 
-## Production Considerations
+- ✅ Azure Workload Identity (OIDC)
+- ✅ No stored credentials
+- ✅ Federated authentication
+- ✅ Separate read/write permissions
+- ✅ Azure RBAC on AKS
+- ✅ Encrypted Terraform state
 
-1. **Scoped Permissions**: Consider scoping to resource groups after initial setup
-2. **Monitoring**: Enable Azure Monitor for containers
-3. **Backup**: Enable AKS backup for etcd
-4. **Network Policies**: Implement Kubernetes network policies
-5. **Pod Security**: Enable Pod Security Standards
-6. **Multi-Environment**: Create separate resource groups per environment
+## What's Automated
+
+- ✅ Backend storage creation
+- ✅ Service principal creation
+- ✅ Role assignments
+- ✅ GitHub secrets (5 of 7)
+- ✅ AKS cluster deployment
+- ✅ ArgoCD installation
+- ✅ Application deployment
+- ✅ Role assignments for readonly SP
+
+## What's Manual
+
+- ❌ Update backend.tf (one-time)
+- ❌ Add GIT_USERNAME secret (one-time)
+- ❌ Add GIT_TOKEN secret (one-time)
 
 ## License
 
