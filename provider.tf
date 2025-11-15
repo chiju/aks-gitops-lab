@@ -22,7 +22,7 @@ provider "azurerm" {
 }
 
 provider "helm" {
-  kubernetes = {
+  kubernetes {
     host                   = try(data.azurerm_kubernetes_cluster.main.fqdn, "")
     cluster_ca_certificate = try(base64decode(data.azurerm_kubernetes_cluster.main.kube_config.0.cluster_ca_certificate), "")
     
