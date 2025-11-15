@@ -48,4 +48,8 @@ jobs:
       run: terraform init -backend-config="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
     - name: Terraform Destroy
-      run: terraform destroy -auto-approve -no-color
+      run: |
+        terraform destroy -auto-approve -no-color \
+          -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
+          -var="github_username=${{ secrets.GIT_USERNAME }}" \
+          -var="github_token=${{ secrets.GIT_TOKEN }}"
