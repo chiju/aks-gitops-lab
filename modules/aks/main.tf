@@ -58,3 +58,4 @@ resource "azurerm_role_assignment" "readonly_cluster_admin" {
   role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
   principal_id         = var.readonly_client_id
 } # Test prometheus deployment
+# Add promtail for log collection
