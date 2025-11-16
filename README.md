@@ -443,14 +443,27 @@ git commit --allow-empty -m "Redeploy" && git push
 - ✅ Network policies (via Azure CNI)
 - ✅ Secrets stored in GitHub Secrets
 
-### Recommended Additions
+### Recommended for Production
 
-- 🔲 Azure Key Vault for application secrets
-- 🔲 Pod Security Standards enforcement
-- 🔲 Network policies for pod-to-pod traffic
-- 🔲 Azure Policy for compliance
-- 🔲 Azure Defender for Kubernetes
-- 🔲 Regular security scanning (Trivy, Snyk)
+**Security Enhancements:**
+- 🔲 **External Secrets Operator** - Sync secrets from Azure Key Vault
+- 🔲 **Private Cluster Endpoint** - Restrict API server access
+- 🔲 **Network Policies** - Control pod-to-pod traffic
+- 🔲 **Pod Security Standards** - Enforce security policies
+- 🔲 **Azure Policy** - Compliance and governance
+
+**Infrastructure Improvements:**
+- 🔲 **Separate Node Pools** - System vs user workloads
+- 🔲 **Production VM Sizes** - Standard_D2s_v3 instead of B2s
+- 🔲 **Resource Limits** - CPU/memory limits on all pods
+- 🔲 **Velero Backups** - Disaster recovery
+- 🔲 **Multi-region** - High availability
+
+**Operational:**
+- 🔲 **Cost Alerts** - Azure Cost Management budgets
+- 🔲 **Terraform Workspaces** - Dev/staging/prod environments
+- 🔲 **Runbooks** - Incident response procedures
+- 🔲 **SLO/SLA Monitoring** - Service level objectives
 
 ## 📚 What's Automated
 
@@ -489,7 +502,31 @@ This is a learning lab project. Feel free to fork and adapt for your needs!
 
 ## ⚠️ Important Notes
 
-- **Not for production**: This is a learning environment
-- **Costs money**: Remember to destroy resources when done
-- **Security**: Review and adapt security settings for your use case
-- **Monitoring**: Adjust resource limits based on your workload
+### Current Setup
+- **Purpose**: Learning and portfolio demonstration
+- **Environment**: Lab/Development
+- **VM Size**: Standard_B2s (burstable, cost-optimized)
+- **Security**: Basic (OIDC, RBAC, encrypted state)
+
+### For Production Use
+This setup provides a **solid foundation** but requires these enhancements:
+
+**Must Have:**
+- Private cluster endpoint
+- Network policies
+- Resource limits on all pods
+- External Secrets Operator with Key Vault
+- Velero backups
+- Production VM sizes (Standard_D2s_v3+)
+
+**Should Have:**
+- Separate system/user node pools
+- Cost alerts and budgets
+- Multi-environment setup (dev/staging/prod)
+- Comprehensive monitoring and alerting
+- Disaster recovery plan
+
+**Cost Considerations:**
+- Current setup: ~$80-90/month
+- Production setup: ~$200-300/month (with redundancy)
+- Remember to destroy resources when not in use
