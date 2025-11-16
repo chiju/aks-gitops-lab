@@ -68,7 +68,7 @@ This project demonstrates a **complete GitOps workflow** from zero to a fully au
 
 **Output:** Storage account name (e.g., `tfstate27a151e5`)
 
-**Action:** Update `backend.tf` with the storage account name:
+**Action:** Update `terraform/backend.tf` with the storage account name:
 ```hcl
 storage_account_name = "tfstate27a151e5"  # Use your output
 ```
@@ -183,17 +183,21 @@ Developer → PR → Plan (read-only) → Review → Merge → Apply (full-acces
 │   ├── kube-prometheus-stack.yaml
 │   ├── loki.yaml
 │   └── promtail.yaml
-├── modules/              # Terraform modules
-│   ├── aks/             # AKS cluster configuration
-│   ├── argocd/          # ArgoCD Helm deployment
-│   ├── resource-group/  # Azure resource group
-│   └── vnet/            # Virtual network
+├── terraform/            # Terraform infrastructure
+│   ├── modules/          # Terraform modules
+│   │   ├── aks/         # AKS cluster configuration
+│   │   ├── argocd/      # ArgoCD Helm deployment
+│   │   ├── resource-group/  # Azure resource group
+│   │   └── vnet/        # Virtual network
+│   ├── backend.tf       # Terraform backend configuration
+│   ├── main.tf          # Main Terraform configuration
+│   ├── variables.tf     # Variable definitions
+│   ├── outputs.tf       # Output definitions
+│   └── provider.tf      # Provider configuration
 ├── scripts/              # Automation scripts
 │   ├── bootstrap-backend.sh
 │   ├── setup-complete-access.sh
 │   └── cleanup-all.sh
-├── backend.tf           # Terraform backend configuration
-├── main.tf              # Main Terraform configuration
 └── README.md
 ```
 
@@ -457,7 +461,7 @@ git commit --allow-empty -m "Redeploy" && git push
 
 ## ✋ What's Manual
 
-- ❌ Update `backend.tf` with storage account name (one-time)
+- ❌ Update `terraform/backend.tf` with storage account name (one-time)
 - ❌ Add `GIT_USERNAME` secret (one-time)
 - ❌ Add `GIT_TOKEN` secret (one-time)
 

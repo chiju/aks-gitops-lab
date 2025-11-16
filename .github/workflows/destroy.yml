@@ -45,9 +45,11 @@ jobs:
         terraform_wrapper: false
 
     - name: Terraform Init
+      working-directory: terraform
       run: terraform init -backend-config="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
 
     - name: Terraform Destroy
+      working-directory: terraform
       run: |
         terraform destroy -auto-approve -no-color \
           -var="subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" \
