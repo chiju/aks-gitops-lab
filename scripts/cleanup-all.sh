@@ -7,7 +7,7 @@ echo "🧹 Complete cleanup - deleting everything..."
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 FULL_APP=$(az ad app list --display-name "aks-gitops-lab-github" --query "[0].appId" -o tsv)
 READONLY_APP=$(az ad app list --display-name "aks-gitops-lab-readonly" --query "[0].appId" -o tsv)
-STORAGE_ACCOUNT=$(grep 'storage_account_name' backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
+STORAGE_ACCOUNT=$(grep 'storage_account_name' terraform/backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
 
 # Delete GitHub secrets
 echo "Deleting GitHub secrets..."
@@ -38,7 +38,7 @@ fi
 
 # Delete local Terraform state and cache
 echo "Cleaning local Terraform files..."
-rm -rf .terraform .terraform.lock.hcl terraform.tfstate terraform.tfstate.backup
+rm -rf terraform/.terraform terraform/.terraform.lock.hcl terraform/terraform.tfstate terraform/terraform.tfstate.backup
 
 # Delete resource group (if exists)
 RG_EXISTS=$(az group exists --name aks-gitops-lab)
@@ -53,7 +53,7 @@ echo "✅ Cleanup complete!"
 echo ""
 echo "To start fresh, run:"
 echo "1. ./scripts/bootstrap-backend.sh"
-echo "2. Update backend.tf with new storage account"
+echo "2. Update terraform/backend.tf with new storage account"
 echo "3. ./scripts/setup-complete-access.sh"
 echo "4. Add GIT_USERNAME and GIT_TOKEN secrets"
 echo "5. git push origin main"

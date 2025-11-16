@@ -27,7 +27,7 @@ az storage container create \
 
 echo "✅ Backend created successfully!"
 echo ""
-echo "Add this to your backend.tf:"
+echo "Add this to your terraform/backend.tf:"
 echo "terraform {"
 echo "  backend \"azurerm\" {"
 echo "    resource_group_name  = \"$RESOURCE_GROUP\""

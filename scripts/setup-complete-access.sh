@@ -61,8 +61,8 @@ az role assignment create \
   --scope /subscriptions/$SUBSCRIPTION_ID
 
 # Grant Storage Blob Data Reader access
-STORAGE_ACCOUNT=$(grep 'storage_account_name' backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
-RESOURCE_GROUP=$(grep 'resource_group_name' backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
+STORAGE_ACCOUNT=$(grep 'storage_account_name' terraform/backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
+RESOURCE_GROUP=$(grep 'resource_group_name' terraform/backend.tf | sed 's/.*= *"\([^"]*\)".*/\1/' 2>/dev/null || echo "")
 
 if [ -n "$STORAGE_ACCOUNT" ] && [ -n "$RESOURCE_GROUP" ]; then
   echo "Granting Storage Blob Data Reader access..."
@@ -77,7 +77,7 @@ if [ -n "$STORAGE_ACCOUNT" ] && [ -n "$RESOURCE_GROUP" ]; then
     --role "Storage Account Key Operator Service Role" \
     --scope "/subscriptions/$SUBSCRIPTION_ID/resourceGroups/$RESOURCE_GROUP/providers/Microsoft.Storage/storageAccounts/$STORAGE_ACCOUNT"
 else
-  echo "⚠️  Could not find storage account info in backend.tf"
+  echo "⚠️  Could not find storage account info in terraform/backend.tf"
 fi
 
 # Create federated credential for pull requests
