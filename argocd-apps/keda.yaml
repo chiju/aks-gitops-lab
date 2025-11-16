@@ -27,4 +27,8 @@ spec:
     kind: CustomResourceDefinition
     jsonPointers:
     - /metadata/annotations
+  - group: admissionregistration.k8s.io
+    kind: ValidatingWebhookConfiguration
+    jqPathExpressions:
+    - .webhooks[]?.clientConfig.caBundle
 
