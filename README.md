@@ -43,13 +43,22 @@ This project demonstrates a **complete GitOps workflow** from zero to a fully au
 
 ## 🔐 Security Features
 
+### Authentication & Authorization
 - ✅ **Azure Workload Identity (OIDC)**: No stored credentials
 - ✅ **Federated Authentication**: GitHub Actions authenticates via OIDC
 - ✅ **Dual-Credential Approach**: Separate read/write permissions
 - ✅ **Azure RBAC**: Role-based access control on AKS
-- ✅ **Encrypted State**: Terraform state in Azure Storage with encryption
 - ✅ **Least Privilege**: Minimal permissions for each service principal
+
+### Data Protection
+- ✅ **Encrypted State**: Terraform state in Azure Storage with encryption
 - ✅ **No Secrets in Code**: All sensitive data in GitHub Secrets
+- ✅ **Branch Protection**: PRs required, no direct pushes to main
+
+### Security Scanning
+- ✅ **Trivy**: IaC security scanning in CI/CD pipeline
+- ✅ **Terraform Validation**: Format and validation checks
+- ℹ️ **Note**: CodeQL not included - appropriate for IaC-focused projects. Would add for application code.
 
 ## 📋 Prerequisites
 
