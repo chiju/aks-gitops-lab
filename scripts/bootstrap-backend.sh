@@ -27,12 +27,21 @@ az storage container create \
 
 echo "✅ Backend created successfully!"
 echo ""
-echo "Add this to your terraform/backend.tf:"
-echo "terraform {"
-echo "  backend \"azurerm\" {"
-echo "    resource_group_name  = \"$RESOURCE_GROUP\""
-echo "    storage_account_name = \"$STORAGE_ACCOUNT\""
-echo "    container_name       = \"$CONTAINER_NAME\""
-echo "    key                  = \"aks-gitops-lab.tfstate\""
-echo "  }"
-echo "}"
+
+# Auto-update backend.tf
+BACKEND_FILE="terraform/backend.tf"
+cat > $BACKEND_FILE <<EOF
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "$RESOURCE_GROUP"
+    storage_account_name = "$STORAGE_ACCOUNT"
+    container_name       = "$CONTAINER_NAME"
+    key                  = "aks-gitops-lab.tfstate"
+  }
+}
+EOF
+
+echo "✅ Updated $BACKEND_FILE automatically!"
+echo ""
+echo "Backend configuration:"
+cat $BACKEND_FILE

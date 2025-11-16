@@ -16,16 +16,17 @@ This project demonstrates a **complete GitOps workflow** from zero to a fully au
 
 **Total setup time:** ~20 minutes (mostly waiting for AKS cluster)
 
-**Manual steps:** Only 3 (bootstrap, update config, add 2 secrets)
+**Manual steps:** Only 2 (bootstrap, add 2 secrets)
 
 **Everything else:** Fully automated via GitHub Actions and ArgoCD
 
 ## 🎯 What Gets Deployed
 
 ### Infrastructure
-- **AKS Cluster**: Kubernetes 1.34 with 2 nodes (scalable)
+- **AKS Cluster**: Kubernetes 1.34 with Cluster Autoscaler (1-5 nodes, starts with 2)
 - **Networking**: VNet with dedicated subnet
 - **Storage**: Azure-managed persistent volumes
+- **Autoscaling**: Cluster Autoscaler for automatic node scaling
 
 ### GitOps & Automation
 - **ArgoCD**: Automated application deployment with app-of-apps pattern
@@ -58,7 +59,7 @@ This project demonstrates a **complete GitOps workflow** from zero to a fully au
 - kubectl
 - Git
 
-## 🚀 Quick Start (3 Steps)
+## 🚀 Quick Start (2 Steps)
 
 ### 1. Bootstrap Backend
 
@@ -66,11 +67,15 @@ This project demonstrates a **complete GitOps workflow** from zero to a fully au
 ./scripts/bootstrap-backend.sh
 ```
 
-**Output:** Storage account name (e.g., `tfstate27a151e5`)
+**What it does:**
+- Creates Azure Storage account for Terraform state
+- **Automatically updates** `terraform/backend.tf` with storage account name
+- No manual configuration needed!
 
-**Action:** Update `terraform/backend.tf` with the storage account name:
-```hcl
-storage_account_name = "tfstate27a151e5"  # Use your output
+**Output:** 
+```
+✅ Backend created successfully!
+✅ Updated terraform/backend.tf automatically!
 ```
 
 ### 2. Setup Service Principals
@@ -450,10 +455,12 @@ git commit --allow-empty -m "Redeploy" && git push
 ## 📚 What's Automated
 
 - ✅ Backend storage creation
+- ✅ Backend configuration auto-update
 - ✅ Service principal creation and configuration
 - ✅ Role assignments (subscription and cluster level)
 - ✅ GitHub secrets (5 of 7 automated)
 - ✅ AKS cluster deployment
+- ✅ Cluster Autoscaler configuration
 - ✅ ArgoCD installation and configuration
 - ✅ Application deployment via GitOps
 - ✅ KEDA autoscaling setup
@@ -461,7 +468,6 @@ git commit --allow-empty -m "Redeploy" && git push
 
 ## ✋ What's Manual
 
-- ❌ Update `terraform/backend.tf` with storage account name (one-time)
 - ❌ Add `GIT_USERNAME` secret (one-time)
 - ❌ Add `GIT_TOKEN` secret (one-time)
 
