@@ -2,7 +2,7 @@
 set -e
 
 # Variables
-READONLY_APP_ID="2f83e2ca-2e7a-4fb3-800f-3284cc3e0d9b"
+READONLY_APP_ID=$(az ad app list --display-name "aks-gitops-lab-readonly" --query "[0].appId" -o tsv)
 GITHUB_ORG="chiju"
 GITHUB_REPO="aks-gitops-lab"
 BRANCH_NAME=${1:-$(git branch --show-current)}
