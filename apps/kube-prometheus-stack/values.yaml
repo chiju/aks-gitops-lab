@@ -15,7 +15,7 @@ kube-prometheus-stack:
       serviceMonitorNamespaceSelector: {}
       serviceMonitorSelector:
         matchLabels:
-          release: monitoring
+          release: kube-prometheus-stack
   grafana:
     enabled: true
     adminPassword: admin
