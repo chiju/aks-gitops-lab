@@ -19,10 +19,17 @@ resource "azurerm_kubernetes_cluster" "main" {
     auto_scaling_enabled = true
     min_count            = var.min_node_count
     max_count            = var.max_node_count
+    node_count           = var.node_count
   }
 
   identity {
     type = "SystemAssigned"
+  }
+
+  lifecycle {
+    ignore_changes = [
+      default_node_pool[0].node_count
+    ]
   }
 
   network_profile {
