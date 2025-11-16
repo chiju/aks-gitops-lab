@@ -29,6 +29,7 @@ spec:
     - /metadata/annotations
   - group: admissionregistration.k8s.io
     kind: ValidatingWebhookConfiguration
-    jqPathExpressions:
-    - .webhooks[]?.clientConfig.caBundle
+    name: keda-admission
+    jsonPointers:
+    - /webhooks
 
